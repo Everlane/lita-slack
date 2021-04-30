@@ -53,6 +53,10 @@ module Lita
         def reply_in_thread(channel, messages, thread_ts)
           api.reply_in_thread(channel,  messages, thread_ts)
         end
+
+        def react_with_emoji(channel, messages, thread_ts)
+          api.react_with_emoji(channel,  messages, thread_ts)
+        end
       end
     end
   end
