@@ -56,9 +56,6 @@ module Lita
           api.react_with_emoji(channel, s.to_s, timestamp)
         end
 
-        puts 'lita-slack strings'
-        puts strings
-
         if strings[0] && strings[0][0] == '…'
           thread_ts = timestamp unless thread_ts
           strings[0] = strings[0][1..-1]
@@ -66,10 +63,8 @@ module Lita
 
         if strings.any?
           if thread_ts
-            puts 'reply_in_thread'
             api.reply_in_thread(channel, strings, thread_ts)
           else
-            puts 'send_messages'
             api.send_messages(channel, strings)
           end
         end
