@@ -24,4 +24,3 @@ module Lita
     end
   end
 end
-

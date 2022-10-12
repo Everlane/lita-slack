@@ -857,11 +857,11 @@ describe Lita::Adapters::Slack::API do
           end
         end
       end
-  
+
       describe "with a successful response" do
         let(:http_response) do
           MultiJson.dump({
-            
+
             "ok": true,
             "channels": [
                 {
@@ -908,7 +908,7 @@ describe Lita::Adapters::Slack::API do
             "response_metadata": {
                 "next_cursor": "dGVhbTpDMDI0RzRCR1k="
             }
-          
+
           })
         end
 
@@ -960,7 +960,7 @@ describe Lita::Adapters::Slack::API do
             }
           })
         end
-  
+
         it "returns a response with the Channel's ID" do
           response = subject.conversations_list(params: { limit: 1 })
 
@@ -969,7 +969,7 @@ describe Lita::Adapters::Slack::API do
           expect(response['channels'][1]['id']).to eq(channel_id_2)
         end
       end
-  
+
       describe "with a Slack error" do
         let(:http_response) do
           MultiJson.dump({
@@ -977,18 +977,18 @@ describe Lita::Adapters::Slack::API do
             error: 'invalid_auth'
           })
         end
-  
+
         it "raises a RuntimeError" do
           expect { subject.conversations_list(params: { limit: 1 }) }.to raise_error(
             "Slack API call to conversations.list returned an error: invalid_auth."
           )
         end
       end
-  
+
       describe "with an HTTP error" do
         let(:http_status) { 422 }
         let(:http_response) { '' }
-  
+
         it "raises a RuntimeError" do
           expect { subject.conversations_list(params: { limit: 1 }) }.to raise_error(
             "Slack API call to conversations.list failed with status code 422: ''. Headers: {}"

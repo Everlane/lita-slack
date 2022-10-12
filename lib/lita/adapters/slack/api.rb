@@ -22,13 +22,17 @@ module Lita
         end
 
         def im_open(user_id)
-          response_data = call_api("im.open", user: user_id)
+          response_data = call_api("conversations.open", user: user_id)
 
           SlackIM.new(response_data["channel"]["id"], user_id)
         end
 
         def channels_info(channel_id)
           call_api("channels.info", channel: channel_id)
+        end
+
+        def users_list
+          call_api('users.list')
         end
 
         def channels_list(params: {})
@@ -139,24 +143,50 @@ module Lita
           )
         end
 
+        def react_with_emoji(channel_id, emoji, ts)
+          call_api(
+            "reactions.add",
+            **post_message_config,
+            as_user: true,
+            channel: channel_id,
+            name: emoji,
+            timestamp: ts
+          )
+        end
+
         def set_topic(channel, topic)
           call_api("channels.setTopic", channel: channel, topic: topic)
         end
 
         def rtm_start
-          Lita.logger.debug("Starting `rtm_start` method")
-          response_data = call_api("rtm.start")
+          Lita.logger.debug("Starting `rtm_connect` method")
+          response_data = call_api("rtm.connect")
           Lita.logger.debug("Started building TeamData")
+
+          users_res_data = users_list
+          conversations_res_data = conversations_list
+
+          channels = conversations_res_data['channels'].select do |c|
+            c['is_channel']
+          end
+          groups = conversations_res_data['channels'].select do |c|
+            c['is_group']
+          end
+          ims = conversations_res_data['channels'].select do |c|
+            c['is_im']
+          end
+
+          ims =
           team_data = TeamData.new(
-            SlackIM.from_data_array(response_data["ims"]),
+            SlackIM.from_data_array(ims),
             SlackUser.from_data(response_data["self"]),
-            SlackUser.from_data_array(response_data["users"]),
-            SlackChannel.from_data_array(response_data["channels"]) +
-              SlackChannel.from_data_array(response_data["groups"]),
+            SlackUser.from_data_array(users_res_data['members']),
+            SlackChannel.from_data_array(channels) +
+              SlackChannel.from_data_array(groups),
             response_data["url"],
           )
           Lita.logger.debug("Finished building TeamData")
-          Lita.logger.debug("Finishing method `rtm_start`")
+          Lita.logger.debug("Finishing method `rtm_connect`")
           team_data
         end
 
