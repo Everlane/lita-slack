@@ -30,7 +30,7 @@ module Lita
         @rtm_connection = RTMConnection.build(robot, config)
 
         Lita.logger.debug("Done building RTM connection")
-        rtm_connection.run(&block)
+        rtm_connection.run(nil, { tls: { verify_peer: false } }, &block)
       end
 
       # Returns UID(s) in an Array or String for:
